@@ -1,71 +1,61 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <HelloWorld/>
-    </v-main>
+    <v-container>
+      <v-card>
+        <v-container>
+          <!-- {{ pokemons }} -->
+          <v-row>
+            <v-col cols="3" v-for="pokemon in pokemons.slice(0, 10)" :key="pokemon.name">
+              <v-card>
+                <v-container>
+                  <img :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${get_id(pokemon)}.png`" :alt="pokemon.name" srcset="" width="80%">
+                  <h2 class="text-center">{{ pokemon.name }}</h2>
+                </v-container>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-container>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import axios from 'axios';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+
   },
 
-  data: () => ({
-    //
-  }),
+  data: () => {
+    return {
+      pokemons: []
+    }
+  },
+
+  mounted() {
+    axios
+      .get("https://pokeapi.co/api/v2/pokemon?limit=150")
+      .then((response) => {
+        this.pokemons = response.data.results;
+        // console.log(response);
+      })
+  },
+
+  methods:{
+    get_id(pokemon){
+    return Number(pokemon.url.split("/")[6]);
+  }}
 };
 </script>
 <style>
 #app {
-  background: linear-gradient(
-      to bottom right,
+  background: linear-gradient(to bottom right,
       rgba(10, 10, 10, 1),
-      rgba(12, 39, 63, 1)
-    )
-    no-repeat center center fixed !important;
+      rgba(12, 39, 63, 1)) no-repeat center center fixed !important;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
