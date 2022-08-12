@@ -5,7 +5,7 @@
         <v-row>
           <v-container>
             <!-- <v-img :src="require(../assets/pokedex.png)" class="my-3" contain height="200"></v-img> -->
-            <h1 class="text-center text--white mb-8" style="font-size: 5rem">
+            <h1 class="text-center text--white mb-8" style="font-size: 5rem; color: #11ECA9">
               Pokedex Comunicação
             </h1>
           </v-container>
