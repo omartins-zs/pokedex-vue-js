@@ -1,0 +1,16 @@
+https://vuetifyjs.com/en/getting-started/installation/
+
+
+
+
+https://vuejsbr-docs-next.netlify.app/guide/installation.html#notas-de-lancamento
+
+
+
+
+
+https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable
+
+
+
+https://nodejs.org/en/
