@@ -1,85 +1,135 @@
 <template>
   <v-app>
     <v-container>
-      <v-text-field v-model="search" label="Pesquisar" placeholder="Placeholder" solo>
-      </v-text-field>
-      <v-card>
-        <v-container>
-          <!-- {{ pokemons }} -->
-          <v-row class="mx-0 d-flex justify-center">
-            <v-col cols="3" v-for="pokemon in filtered_pokemons" :key="pokemon.name">
-              <v-card @click="show_dialog = !show_dialog">
-                <v-container>
+      <v-container>
+        <v-row>
+          <v-container>
+            <!-- <v-img :src="require(../assets/pokedex.png)" class="my-3" contain height="200"></v-img> -->
+            <h1 class="text-center text--white mb-8" style="font-size: 5rem">
+              Pokedex Comunicação
+            </h1>
+          </v-container>
+        </v-row>
+
+        <v-text-field
+          v-model="search"
+          label="Pesquisar"
+          placeholder="Placeholder"
+          solo
+        ></v-text-field>
+
+        <v-row>
+          <v-col
+            cols="2"
+            v-for="pokemon in filtered_pokemons"
+            :key="pokemon.name"
+          >
+            <v-card @click="show_pokemon(get_id(pokemon))">
+              <v-container>
+                <v-row class="mx-0 d-flex justify-center">
                   <img
-                    :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${get_id(pokemon)}.png`"
-                    :alt="pokemon.name" srcset="" width="80%">
-                  <h2 class="text-center">{{ pokemon.name }}</h2>
-                </v-container>
-              </v-card>
+                    :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${get_id(
+                      pokemon
+                    )}.png`"
+                    :alt="pokemon.name"
+                    width="80%"
+                  />
+                </v-row>
+                <h2 class="text-center">{{ get_name(pokemon) }}</h2>
+              </v-container>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-container>
+
+    <v-dialog v-model="show_dialog" width="800">
+      <v-card v-if="selected_pokemon" class="px-4">
+        <v-container>
+          <v-row class="d-flex align-center">
+            <v-col cols="4">
+              <img
+                :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${selected_pokemon.id}.png`"
+                :alt="selected_pokemon.name"
+                width="80%"
+              />
+            </v-col>
+            <v-col cols="8">
+              <h1>{{ get_name(selected_pokemon) }}</h1>
+              <v-chip
+                label
+                v-for="type in selected_pokemon.types"
+                :key="type.slot"
+                class="mr-2"
+              >
+                {{ type.type.name }}
+              </v-chip>
+
+              <v-divider class="my-4"> </v-divider>
+
+              <v-chip label
+                >Altura {{ selected_pokemon.height * 2.54 }} cm</v-chip
+              >
+
+              <v-chip label class="ml-2"
+                >Peso
+                {{ (selected_pokemon.weight * 0.45359237).toFixed(0) }}
+                kgs</v-chip
+              >
             </v-col>
           </v-row>
+
+          <h2>Moves</h2>
+
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Level</th>
+                  <th class="text-left">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="item in filter_moves(selected_pokemon)"
+                  :key="item.move.name"
+                >
+                  <td>{{ get_move_level(item) }}</td>
+                  <td>{{ item.move.name }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
         </v-container>
-    </v-container>
-    <div class="text-center">
-     
-      <v-dialog v-model="show_dialog" width="800">
-          <v-container>
-        <v-card @click="show_pokemon(get_id(pokemon))">
-          <v-card-title class="text-h5 grey lighten-2">
-            Privacy Policy
-          </v-card-title>
-
-          <v-card-text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-            anim id est laborum.
-          </v-card-text>
-
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog = false">
-              I accept
-            </v-btn>
-          </v-card-actions>
-          </v-container>
-        </v-card>
-      </v-dialog>
-    </div>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
-  name: 'App',
+  name: "App",
 
-  components: {
-
-  },
+  components: {},
 
   data: () => {
     return {
       pokemons: [],
       search: "",
       show_dialog: false,
-      selected_pokemon: null
-    }
+      selected_pokemon: null,
+    };
   },
 
   mounted() {
     axios
-      .get("https://pokeapi.co/api/v2/pokemon?limit=150")
+      .get(" https://pokeapi.co/api/v2/pokemon?limit=300")
       .then((response) => {
         this.pokemons = response.data.results;
-        // console.log(response);
-      })
+      });
   },
-
   methods: {
     get_id(pokemon) {
       return Number(pokemon.url.split("/")[6]);
@@ -87,29 +137,42 @@ export default {
     get_name(pokemon) {
       return pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
     },
-    show_pokemon(id){
-      axios.get("https://pokeapi.co/api/v2/pokemon/${id}")
-      .then((response) => {
+    show_pokemon(id) {
+      axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`).then((response) => {
         this.selected_pokemon = response.data;
-        // console.log(response);
-      this.show_dialog = !this.show_dialog
-      })
-    }
+        this.show_dialog = !this.show_dialog;
+      });
+    },
+    get_move_level(move) {
+      for (let version of move.version_group_details) {
+        if (
+          version.version_group.name == "sword-shield" &&
+          version.move_learn_method.name == "level-up"
+        ) {
+          return version.level_learned_at;
+        }
+      }
+      return 0;
+    },
   },
   computed: {
     filtered_pokemons() {
       return this.pokemons.filter((item) => {
         return item.name.includes(this.search);
-      })
+      });
     },
   },
 };
 </script>
+
 <style>
 #app {
-  background: linear-gradient(to bottom right,
+  background: linear-gradient(
+      to bottom right,
       rgba(10, 10, 10, 1),
-      rgba(12, 39, 63, 1)) no-repeat center center fixed !important;
+      rgba(12, 39, 63, 1)
+    )
+    no-repeat center center fixed !important;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
